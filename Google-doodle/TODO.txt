@@ -39,4 +39,69 @@ check google map for banglore, find populor spots and locations, pick 10-12 loca
 
 10. rotate player sprite on y axis 90 dgree
 
-11. Add pause button and functionality
+11. Add pause button and functionality, use pause icon as for the button. Look up for errors in code, especially styling, remove all rotate from payer sprite
+
+12. player sprite for some reason is not visibile
+
+13. share summary of hurdle challenge, things to cover project context, understanding of the challenge, current implementation of the challenege
+
+14.
+Goal:
+Improve navigation clarity in the Bangalore Traffic Hurdle game by replacing current “painted road choices” with clear, immersive decision mechanics inspired by Temple Run.
+
+Requirements:
+
+1. Road Transformation
+- When a navigation decision occurs, the single road should visually transform into:
+  - A T-junction (left/right choice), or
+  - A forked split (Y-shaped divergence)
+- The split must be visually obvious with clear separation and depth.
+
+2. Swipe-Based Decision
+- At the moment of reaching the junction, require a strong left or right swipe.
+- If no swipe is detected within a short time window, trigger a failure (crash or wrong route).
+- The swipe should feel decisive (not small lane movement like normal dodging).
+
+3. Direction Boards (Primary Cue)
+- Add large, readable overhead billboards above each path:
+  - Example: “MG Road ←” and “→ Whitefield”
+- Boards must:
+  - Be positioned above each diverging lane
+  - Scale properly for mobile screens
+  - Be readable within ~1 second of appearance
+
+4. Visual Guidance
+- Add additional cues to reinforce direction:
+  - Lane arrows on the road (secondary, not primary)
+  - Slight camera tilt or highlight toward selected direction
+  - Optional glow or color highlight for each path
+
+5. Transition Timing
+- Introduce the junction gradually:
+  - Show preview (boards appear first)
+  - Then road splits
+  - Then enforce swipe decision
+
+6. UX Constraints (Mobile First)
+- Ensure all elements are clearly visible on small screens (portrait mode)
+- Avoid clutter—focus on 2 clear choices only
+- Maintain smooth performance (60 FPS target)
+
+7. Failure / Feedback
+- If player chooses wrong direction:
+  - Show “Wrong Route” feedback
+- If no input:
+  - Trigger crash or auto-fail with feedback
+
+8. Code Expectations
+- Modular implementation:
+  - JunctionManager (handles spawn + logic)
+  - SwipeHandler (detects strong directional swipe)
+  - UIOverlay (renders billboards)
+- Avoid breaking existing traffic/collision systems
+
+Output:
+- Updated rendering logic for road split
+- Swipe detection logic for hard turns
+- Billboard UI implementation
+- Integration into game loop
