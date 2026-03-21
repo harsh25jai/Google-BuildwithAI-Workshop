@@ -78,7 +78,11 @@ h1 span {
     position: relative;
     overflow: hidden;
     perspective: 1200px;
-    /* Increased for deeper view */
+    transition: transform 1s ease;
+}
+
+#game-viewport.zoomed {
+    transform: scale(1.1);
 }
 
 #road-wrapper {
@@ -86,17 +90,17 @@ h1 span {
     height: 100%;
     position: absolute;
     transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(0.77, 0, 0.175, 1);
 }
 
 .road-segment {
     width: 100%;
     height: 200%;
-    background: #334155;
     position: absolute;
-    bottom: -20%;
+    bottom: 0;
     left: 0;
     transform: rotateX(75deg);
-    transform-origin: bottom;
+    transform-origin: bottom center;
 }
 
 .road-lines {
@@ -109,36 +113,93 @@ h1 span {
     background: repeating-linear-gradient(to bottom, transparent, transparent 60px, rgba(255, 255, 255, 0.4) 60px, rgba(255, 255, 255, 0.4) 120px);
 }
 
-#road-split-l,
-#road-split-r {
-    width: 60%;
-    transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+#road-main { 
+    z-index: 3; 
+    background: #334155; 
+    transition: opacity 0.4s ease, filter 0.4s ease;
 }
 
-#road-split-l.highlight {
-    box-shadow: 0 0 40px var(--primary-blue);
-    border-left: 2px solid var(--primary-blue);
+/* Main road dimmed when player must turn */
+#road-main.blocked {
+    opacity: 0.25;
+    filter: blur(3px);
 }
 
-#road-split-r.highlight {
-    box-shadow: 0 0 40px var(--primary-green);
-    border-right: 2px solid var(--primary-green);
+/* ─── T-JUNCTION SIDE ARMS ───────────────────────────────────────
+   Simple horizontal road bars that appear left/right at junction level.
+   No 3D transforms — just flat, absolute-positioned divs.
+   They sit in game-viewport space, outside the 3D road-wrapper. */
+
+#road-split-l, #road-split-r {
+    position: absolute;
+    width: 45%;
+    height: 14%;
+    top: 48%;
+    background: #334155;
+    border-top: 3px solid #4a5568;
+    border-bottom: 3px solid #4a5568;
+    z-index: 4;
+    opacity: 0;
+    transition: opacity 0.45s ease 0.25s;
 }
 
-#road-split-l {
-    transform: rotateX(75deg) rotateY(-20deg) translateX(-60%);
+/* Dashed center stripe */
+#road-split-l::after, #road-split-r::after {
+    content: '';
+    position: absolute;
+    top: calc(50% - 2px);
+    left: 10%;
+    right: 10%;
+    height: 3px;
+    background: repeating-linear-gradient(
+        to right,
+        rgba(255,255,255,0.55) 0, rgba(255,255,255,0.55) 18px,
+        transparent 18px, transparent 32px
+    );
 }
 
-#road-split-r {
-    transform: rotateX(75deg) rotateY(20deg) translateX(60%);
+/* Direction label */
+#road-split-l::before {
+    content: '← ';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.5);
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+#road-split-r::before {
+    content: ' →';
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.5);
+    font-size: 0.7rem;
+    font-weight: 700;
 }
 
-.splitting #road-main {
-    clip-path: polygon(0% 0%, 100% 0%, 100% 60%, 50% 100%, 0% 60%);
-    transition: clip-path 1.5s ease;
+#game-viewport.splitting #road-split-l,
+#game-viewport.splitting #road-split-r {
+    opacity: 1;
 }
+
+#road-split-l { left: 0; }
+#road-split-r { right: 0; }
+
+#road-split-l.highlight, #road-split-r.highlight {
+    background: #1e3a2e;
+    border-color: var(--primary-yellow);
+    box-shadow: 0 0 20px rgba(255, 200, 0, 0.35);
+}
+
+#road-split-l.fading, #road-split-r.fading {
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+
 
 #billboard-overlay {
     position: absolute;
@@ -152,31 +213,31 @@ h1 span {
 
 .overhead-board {
     position: absolute;
-    padding: 1.5rem 2rem;
-    background: #1e293b;
-    border: 4px solid var(--primary-yellow);
-    border-radius: 20px;
+    top: 5%;
+    background: #065f46;
     color: white;
-    font-size: 1.5rem;
-    font-weight: 800;
-    text-align: center;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    padding: 12px 24px;
+    border: 3px solid white;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     opacity: 0;
-    transform: translateY(-50px) scale(0.8);
+    transform: translateZ(500px) scale(0.3) translateY(-100px);
+    z-index: 1000;
 }
 
 .overhead-board.visible {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateZ(800px) scale(1) translateY(0);
 }
 
-.board-left {
-    left: 5%;
-}
+.board-left { left: 15%; transform: translateZ(500px) rotateY(10deg); }
+.board-right { right: 15%; transform: translateZ(500px) rotateY(-10deg); }
 
-.board-right {
-    right: 5%;
+.overhead-board span {
+    display: block;
+    font-size: 0.7rem;
+    color: #fcd34d;
+    margin-bottom: 2px;
 }
 
 .lane-arrow {
@@ -256,18 +317,28 @@ h1 span {
 }
 
 .rickshaw {
-    background: var(--primary-yellow);
+    background: #fbbf24; /* Better yellow */
     border: 2px solid #000;
 }
 
 .car {
-    background: var(--primary-red);
+    background: #ef4444; /* Better red */
     border: 2px solid #000;
 }
 
 .bus {
-    background: var(--primary-green);
+    background: #10b981; /* Better green */
     border: 2px solid #000;
+}
+
+.shake {
+    animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
 }
 
 .billboard {
@@ -416,10 +487,6 @@ h1 span {
     font-size: 1.1rem;
 }
 
-#pause-menu.hidden {
-    display: none !important;
-}
-
 #restart-btn {
     background: var(--primary-red);
     color: white;
@@ -435,8 +502,4 @@ h1 span {
 
 #restart-btn:hover {
     transform: scale(1.05);
-}
-
-#game-over.hidden {
-    display: none !important;
 }

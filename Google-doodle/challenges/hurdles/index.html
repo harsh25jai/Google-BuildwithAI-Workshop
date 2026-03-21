@@ -17,7 +17,7 @@
             <div id="game-stats">
                 <div id="location">Dest: <span>Vidhan Sabha</span></div>
                 <div id="score">Dist: <span id="score-val">0</span>m</div>
-                <button id="pause-btn">⏸</button>
+                <button id="pause-btn" aria-label="Pause game">⏸</button>
             </div>
         </header>
 
@@ -27,16 +27,14 @@
                     <div id="horizon"></div>
                     <div class="road-lines"></div>
                 </div>
-                <div id="road-split-l" class="road-segment hidden">
-                    <div class="lane-arrow">↖</div>
-                </div>
-                <div id="road-split-r" class="road-segment hidden">
-                    <div class="lane-arrow">↗</div>
-                </div>
-                
-                <div id="billboard-overlay"></div>
-                <div id="player"></div>
             </div>
+
+            <!-- Split roads: flat 2D trapezoids outside the 3D road-wrapper -->
+            <div id="road-split-l"></div>
+            <div id="road-split-r"></div>
+                
+            <div id="billboard-overlay"></div>
+            <div id="player"></div>
             <div id="nav-feedback" class="hidden">Wrong Route!</div>
         </div>
 
