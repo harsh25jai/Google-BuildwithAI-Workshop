@@ -18,12 +18,10 @@ let baseSpeed = 5;
 let speed = baseSpeed;
 let nextMilestone = 1000;
 let vehicles = [];
-let billboards = [];
 let keys = {};
 let gameLoopId = null;
 let isJunctionActive = false;
 let junctionDecisionMade = false;
-let roadMainEl = document.getElementById('road-main');
 let roadSplitLEl = document.getElementById('road-split-l');
 let roadSplitREl = document.getElementById('road-split-r');
 let billboardOverlayEl = document.getElementById('billboard-overlay');
@@ -58,27 +56,58 @@ const swipeHandler = new SwipeHandler();
 
 // Junction Manager
 const JunctionManager = {
-    active: false,
+    state: 'NORMAL',
     options: [],
-    decisionWindow: false,
     timer: 0,
+    isInputLocked: false,
+    _pendingTimers: [],
+
+    _setTimeout(fn, ms) {
+        const id = setTimeout(fn, ms);
+        this._pendingTimers.push(id);
+        return id;
+    },
+
+    clearTimers() {
+        this._pendingTimers.forEach(clearTimeout);
+        this._pendingTimers = [];
+    },
 
     spawn() {
-        this.active = true;
-        this.decisionWindow = false;
-        this.timer = 0;
+        if (this.state !== 'NORMAL') return;
+        this.enterPreview();
+    },
+
+    enterPreview() {
+        this.state = 'PREVIEW';
         isJunctionActive = true;
-        
         const options = roadMap[currentCity] || ['MG Road', 'Indiranagar'];
         this.options = [options[0], options[Math.min(1, options.length - 1)]];
-
-        this.showBoards();
-        roadWrapperEl.classList.add('splitting');
-        roadSplitLEl.classList.remove('hidden');
-        roadSplitREl.classList.remove('hidden');
         
-        // Pause traffic spawning
-        gameActive = true; 
+        this.showBoards();
+        // Preview phase: show boards early, narrow road
+        road.classList.add('narrowing'); // Optional: can add narrowing style
+        this._setTimeout(() => this.enterSplit(), 1000);
+    },
+
+    enterSplit() {
+        this.state = 'SPLIT';
+        // Show side road arms in game-viewport
+        document.getElementById('game-viewport').classList.add('splitting');
+        // Dim forward road — player must turn
+        road.classList.add('blocked');
+        
+        document.getElementById('game-viewport').classList.add('zoomed');
+        this._setTimeout(() => this.enterDecision(), 500);
+    },
+
+    enterDecision() {
+        this.state = 'DECISION';
+        this.isInputLocked = true;
+        this.timer = 0; 
+        // Ensure player is centered for the fork
+        playerX = 50;
+        player.style.left = '50%';
     },
 
     showBoards() {
@@ -89,31 +118,40 @@ const JunctionManager = {
     },
 
     update() {
-        if (!this.active) return;
+        if (this.state !== 'DECISION') return;
+        
         this.timer += 1;
-
-        if (this.timer > 100) { // After 100 frames, enforce decision
-            this.decisionWindow = true;
-        }
-
-        if (this.timer > 200 && !junctionDecisionMade) {
-            this.fail("Missed Turn!");
+        // Enforce 800ms decision window (~48 frames at 60fps)
+        if (this.timer > 48) {
+            this.fail("Too Late!");
         }
     },
 
     handleSwipe(direction) {
-        if (!this.decisionWindow || junctionDecisionMade) return;
+        if (this.state !== 'DECISION') return;
+        this.resolve(direction);
+    },
 
-        junctionDecisionMade = true;
+    resolve(direction) {
+        this.state = 'RESOLVE';
         const chosen = direction === 'left' ? this.options[0] : this.options[1];
         
-        // Highlight chosen road
-        if (direction === 'left') roadSplitLEl.classList.add('highlight');
-        else roadSplitREl.classList.add('highlight');
+        // Highlight chosen arm, fade other
+        if (direction === 'left') {
+            roadSplitLEl.classList.add('highlight');
+            roadSplitREl.classList.add('fading');
+        } else {
+            roadSplitREl.classList.add('highlight');
+            roadSplitLEl.classList.add('fading');
+        }
 
-        setTimeout(() => {
+        // Temple Run world rotation — world turns, player stays centered
+        const angle = direction === 'left' ? '-90deg' : '90deg';
+        roadWrapperEl.style.transform = `rotateZ(${angle})`;
+
+        this._setTimeout(() => {
             this.success(chosen);
-        }, 800);
+        }, 650);
     },
 
     success(city) {
@@ -131,24 +169,38 @@ const JunctionManager = {
     fail(reason) {
         navFeedbackEl.textContent = reason;
         navFeedbackEl.classList.remove('hidden');
-        setTimeout(() => {
+        document.getElementById('game-viewport').classList.add('shake');
+        this._setTimeout(() => {
+            document.getElementById('game-viewport').classList.remove('shake');
             endGame();
-        }, 1500);
+        }, 1200);
     },
 
     reset() {
-        this.active = false;
+        this.clearTimers();
+        this.state = 'NORMAL';
+        this.isInputLocked = false;
         isJunctionActive = false;
-        junctionDecisionMade = false;
         this.timer = 0;
-        roadWrapperEl.classList.remove('splitting');
+
+        // Remove junction states from DOM
+        const viewport = document.getElementById('game-viewport');
+        viewport.classList.remove('splitting', 'zoomed');
+        // Instantly reset rotation (disable transition briefly, then re-enable)
+        roadWrapperEl.style.transition = 'none';
         roadWrapperEl.style.transform = '';
-        roadSplitLEl.classList.add('hidden');
-        roadSplitREl.classList.add('hidden');
-        roadSplitLEl.classList.remove('highlight');
-        roadSplitREl.classList.remove('highlight');
-        billboardOverlayEl.innerHTML = '';
-        navFeedbackEl.classList.add('hidden');
+        requestAnimationFrame(() => {
+            roadWrapperEl.style.transition = '';
+        });
+
+        // Un-dim road and clear narrowing class
+        road.classList.remove('blocked', 'narrowing');
+
+        if (roadSplitLEl) roadSplitLEl.classList.remove('highlight', 'fading');
+        if (roadSplitREl) roadSplitREl.classList.remove('highlight', 'fading');
+        if (billboardOverlayEl) billboardOverlayEl.innerHTML = '';
+        if (navFeedbackEl) navFeedbackEl.classList.add('hidden');
+
         // Reset player x to center
         playerX = 50;
         player.style.left = '50%';
@@ -193,7 +245,8 @@ function initGame() {
     playerX = 50;
     isGameOver = false;
     gameActive = true;
-    nextMilestone = 1000;
+    nextMilestone = 400; // Lowered for faster testing
+    JunctionManager.reset();
     
     // Clear UI
     scoreEl.textContent = 0;
@@ -202,15 +255,14 @@ function initGame() {
     
     // Clear existing objects
     vehicles.forEach(v => v.element.remove());
-    billboards.forEach(b => b.element.remove());
     vehicles = [];
-    billboards = [];
     
     if (gameLoopId) cancelAnimationFrame(gameLoopId);
     gameLoopId = requestAnimationFrame(updateGame);
 }
 
 function updatePlayer() {
+    if (JunctionManager.isInputLocked || isJunctionActive) return;
     let moving = false;
     if (keys['ArrowLeft'] || keys['KeyA']) {
         playerX -= 2.0;
@@ -269,30 +321,6 @@ function spawnVehicle() {
     vehicles.push(vehicle);
 }
 
-function spawnFork() {
-    const options = roadMap[currentCity] || ['MG Road', 'Indiranagar'];
-    const dest1 = options[0];
-    const dest2 = options[Math.min(1, options.length - 1)];
-
-    const createBillboard = (x, text, side) => {
-        const b = {
-            x: x,
-            y: 80,
-            text: text,
-            side: side,
-            element: document.createElement('div')
-        };
-        b.element.className = `billboard ${side}`;
-        b.element.innerHTML = `<span>TO</span> ${text}`;
-        road.appendChild(b.element);
-        billboards.push(b);
-    };
-
-    // Position billboards to the edges to look like a fork
-    createBillboard(25, dest1, 'left');
-    createBillboard(75, dest2, 'right');
-}
-
 function updateGame() {
     if (!gameActive || isGameOver) {
         gameLoopId = null;
@@ -302,7 +330,7 @@ function updateGame() {
     score += 1;
     scoreEl.textContent = Math.floor(score / 10);
 
-    if (score % 60 === 0 && !isJunctionActive) spawnVehicle();
+    // if (score % 60 === 0 && !isJunctionActive) spawnVehicle();
     
     if (score > 0 && score % nextMilestone === 0 && !isJunctionActive) {
         JunctionManager.spawn();
@@ -313,7 +341,8 @@ function updateGame() {
     }
 
     // Vehicles
-    vehicles.forEach((v, index) => {
+    const visibleVehicles = [];
+    vehicles.forEach((v) => {
         v.y += v.speed * 0.45;
         const scale = (v.y - 100) / 400 + 0.1;
         
@@ -323,7 +352,8 @@ function updateGame() {
         v.element.style.height = (v.height * scale) + 'px';
         v.element.style.opacity = Math.min(1, scale * 2);
 
-        if (score > 100 && v.y > 600) {
+        // Bypass collision during junctions
+        if (score > 100 && v.y > 600 && !isJunctionActive) {
             const playerRect = player.getBoundingClientRect();
             const vRect = v.element.getBoundingClientRect();
             
@@ -340,14 +370,13 @@ function updateGame() {
             }
         }
 
-        if (v.y > 1100) {
+        if (v.y <= 1100) {
+            visibleVehicles.push(v);
+        } else {
             v.element.remove();
-            vehicles.splice(index, 1);
         }
     });
-
-    // Billboards (Old logic removed, handled by JunctionManager)
-    billboards = [];
+    vehicles = visibleVehicles;
 
     updatePlayer();
     gameLoopId = requestAnimationFrame(updateGame);
@@ -381,9 +410,24 @@ window.addEventListener('keydown', (e) => {
 window.addEventListener('keyup', (e) => keys[e.code] = false);
 
 // Touch/Swipe support
+let touchStartX = 0;
 window.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
     swipeHandler.start(e.touches[0].clientX);
 });
+
+window.addEventListener('touchmove', (e) => {
+    if (JunctionManager.isInputLocked) return;
+    if (!isJunctionActive && gameActive && !isGameOver) {
+        const touchX = e.touches[0].clientX;
+        const diff = touchX - touchStartX;
+        playerX += diff * 0.2; // Adjusted sensitivity
+        playerX = Math.max(20, Math.min(80, playerX));
+        player.style.left = playerX + '%';
+        touchStartX = touchX;
+        e.preventDefault();
+    }
+}, { passive: false });
 
 window.addEventListener('touchend', (e) => {
     const direction = swipeHandler.end(e.changedTouches[0].clientX);

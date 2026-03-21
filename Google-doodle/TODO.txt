@@ -39,11 +39,11 @@ check google map for banglore, find populor spots and locations, pick 10-12 loca
 
 10. rotate player sprite on y axis 90 dgree
 
-11. Add pause button and functionality, use pause icon as for the button. Look up for errors in code, especially styling, remove all rotate from payer sprite
+11. Add pause button and functionality, use pause icon as for the button. Look up for errors in code, especially styling, remove all rotate from player sprite
 
-12. player sprite for some reason is not visibile
+12. player sprite for some reason is not visible
 
-13. share summary of hurdle challenge, things to cover project context, understanding of the challenge, current implementation of the challenege
+13. share summary of hurdle challenge, things to cover project context, understanding of the challenge, current implementation of the challenge
 
 14.
 Goal:
