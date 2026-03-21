@@ -1,5 +1,5 @@
 const player = document.getElementById('player');
-const road = document.getElementById('road');
+const road = document.getElementById('road-main');
 const scoreEl = document.getElementById('score-val');
 const locationEl = document.querySelector('#location span');
 const gameOverEl = document.getElementById('game-over');
@@ -21,6 +21,139 @@ let vehicles = [];
 let billboards = [];
 let keys = {};
 let gameLoopId = null;
+let isJunctionActive = false;
+let junctionDecisionMade = false;
+let roadMainEl = document.getElementById('road-main');
+let roadSplitLEl = document.getElementById('road-split-l');
+let roadSplitREl = document.getElementById('road-split-r');
+let billboardOverlayEl = document.getElementById('billboard-overlay');
+let roadWrapperEl = document.getElementById('road-wrapper');
+let navFeedbackEl = document.getElementById('nav-feedback');
+
+// Swipe Handler
+class SwipeHandler {
+    constructor() {
+        this.startX = 0;
+        this.startTime = 0;
+        this.threshold = 50; // Required distance
+        this.timeThreshold = 300; // Max time for a "hard" swipe
+    }
+
+    start(x) {
+        this.startX = x;
+        this.startTime = Date.now();
+    }
+
+    end(x) {
+        const diffX = x - this.startX;
+        const diffTime = Date.now() - this.startTime;
+
+        if (Math.abs(diffX) > this.threshold && diffTime < this.timeThreshold) {
+            return diffX > 0 ? 'right' : 'left';
+        }
+        return null;
+    }
+}
+const swipeHandler = new SwipeHandler();
+
+// Junction Manager
+const JunctionManager = {
+    active: false,
+    options: [],
+    decisionWindow: false,
+    timer: 0,
+
+    spawn() {
+        this.active = true;
+        this.decisionWindow = false;
+        this.timer = 0;
+        isJunctionActive = true;
+        
+        const options = roadMap[currentCity] || ['MG Road', 'Indiranagar'];
+        this.options = [options[0], options[Math.min(1, options.length - 1)]];
+
+        this.showBoards();
+        roadWrapperEl.classList.add('splitting');
+        roadSplitLEl.classList.remove('hidden');
+        roadSplitREl.classList.remove('hidden');
+        
+        // Pause traffic spawning
+        gameActive = true; 
+    },
+
+    showBoards() {
+        billboardOverlayEl.innerHTML = `
+            <div class="overhead-board board-left visible"><span>TO</span> ${this.options[0]}</div>
+            <div class="overhead-board board-right visible"><span>TO</span> ${this.options[1]}</div>
+        `;
+    },
+
+    update() {
+        if (!this.active) return;
+        this.timer += 1;
+
+        if (this.timer > 100) { // After 100 frames, enforce decision
+            this.decisionWindow = true;
+        }
+
+        if (this.timer > 200 && !junctionDecisionMade) {
+            this.fail("Missed Turn!");
+        }
+    },
+
+    handleSwipe(direction) {
+        if (!this.decisionWindow || junctionDecisionMade) return;
+
+        junctionDecisionMade = true;
+        const chosen = direction === 'left' ? this.options[0] : this.options[1];
+        
+        // Highlight chosen road
+        if (direction === 'left') roadSplitLEl.classList.add('highlight');
+        else roadSplitREl.classList.add('highlight');
+
+        setTimeout(() => {
+            this.success(chosen);
+        }, 800);
+    },
+
+    success(city) {
+        currentCity = city;
+        if (currentCity === targetCity) {
+            winGame();
+        } else {
+            locationEl.innerHTML = `From: <b>${currentCity}</b><br>To: <b style="color:var(--primary-red)">${targetCity}</b>`;
+            speed += 0.5;
+            nextMilestone += 1500;
+            this.reset();
+        }
+    },
+
+    fail(reason) {
+        navFeedbackEl.textContent = reason;
+        navFeedbackEl.classList.remove('hidden');
+        setTimeout(() => {
+            endGame();
+        }, 1500);
+    },
+
+    reset() {
+        this.active = false;
+        isJunctionActive = false;
+        junctionDecisionMade = false;
+        this.timer = 0;
+        roadWrapperEl.classList.remove('splitting');
+        roadWrapperEl.style.transform = '';
+        roadSplitLEl.classList.add('hidden');
+        roadSplitREl.classList.add('hidden');
+        roadSplitLEl.classList.remove('highlight');
+        roadSplitREl.classList.remove('highlight');
+        billboardOverlayEl.innerHTML = '';
+        navFeedbackEl.classList.add('hidden');
+        // Reset player x to center
+        playerX = 50;
+        player.style.left = '50%';
+    }
+};
 
 // Bangalore Navigation Graph
 const locations = [
@@ -169,14 +302,14 @@ function updateGame() {
     score += 1;
     scoreEl.textContent = Math.floor(score / 10);
 
-    if (score % 50 === 0) spawnVehicle();
-    if (score % nextMilestone === 0) {
-        spawnFork();
-        road.classList.add('forking');
+    if (score % 60 === 0 && !isJunctionActive) spawnVehicle();
+    
+    if (score > 0 && score % nextMilestone === 0 && !isJunctionActive) {
+        JunctionManager.spawn();
     }
 
-    if (billboards.length === 0) {
-        road.classList.remove('forking');
+    if (isJunctionActive) {
+        JunctionManager.update();
     }
 
     // Vehicles
@@ -194,7 +327,6 @@ function updateGame() {
             const playerRect = player.getBoundingClientRect();
             const vRect = v.element.getBoundingClientRect();
             
-            // Adjust collision box for more fairness/visual accuracy
             const collisionPaddingX = 12;
             const collisionPaddingY = 15;
             
@@ -214,39 +346,8 @@ function updateGame() {
         }
     });
 
-    // Billboards
-    billboards.forEach((b, index) => {
-        b.y += speed * 0.45;
-        const scale = (b.y - 80) / 400 + 0.1;
-        b.element.style.top = b.y + 'px';
-        b.element.style.left = b.x + '%';
-        b.element.style.transform = `translate(-50%, -100%) scale(${scale})`;
-        b.element.style.opacity = Math.min(1, scale * 3);
-
-        if (b.y > 650) {
-            // Check which side the player is on
-            if ((b.side === 'left' && playerX < 50) || (b.side === 'right' && playerX >= 50)) {
-                if (Math.abs(playerX - b.x) < 20) {
-                    currentCity = b.text;
-                    if (currentCity === targetCity) {
-                        winGame();
-                    } else {
-                        locationEl.innerHTML = `From: <b>${currentCity}</b><br>To: <b style="color:var(--primary-red)">${targetCity}</b>`;
-                        speed += 0.5;
-                        nextMilestone += 1000;
-                    }
-                    // Remove all billboards once one is chosen
-                    billboards.forEach(bill => bill.element.remove());
-                    billboards = [];
-                }
-            }
-        }
-
-        if (b.y > 1000) {
-            b.element.remove();
-            billboards.splice(index, 1);
-        }
-    });
+    // Billboards (Old logic removed, handled by JunctionManager)
+    billboards = [];
 
     updatePlayer();
     gameLoopId = requestAnimationFrame(updateGame);
@@ -270,22 +371,26 @@ function winGame() {
 }
 
 // Controls
-window.addEventListener('keydown', (e) => keys[e.code] = true);
+window.addEventListener('keydown', (e) => {
+    keys[e.code] = true;
+    if (isJunctionActive) {
+        if (e.code === 'ArrowLeft' || e.code === 'KeyA') JunctionManager.handleSwipe('left');
+        if (e.code === 'ArrowRight' || e.code === 'KeyD') JunctionManager.handleSwipe('right');
+    }
+});
 window.addEventListener('keyup', (e) => keys[e.code] = false);
 
-// Touch support
-let touchStartX = 0;
+// Touch/Swipe support
 window.addEventListener('touchstart', (e) => {
-    touchStartX = e.touches[0].clientX;
+    swipeHandler.start(e.touches[0].clientX);
 });
-window.addEventListener('touchmove', (e) => {
-    const touchX = e.touches[0].clientX;
-    const diff = touchX - touchStartX;
-    playerX += diff * 0.1;
-    playerX = Math.max(15, Math.min(85, playerX));
-    touchStartX = touchX;
-    e.preventDefault();
-}, { passive: false });
+
+window.addEventListener('touchend', (e) => {
+    const direction = swipeHandler.end(e.changedTouches[0].clientX);
+    if (direction) {
+        if (isJunctionActive) JunctionManager.handleSwipe(direction);
+    }
+});
 
 restartBtn.addEventListener('click', (e) => {
     e.preventDefault();

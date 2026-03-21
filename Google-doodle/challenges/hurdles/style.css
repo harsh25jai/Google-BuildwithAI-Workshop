@@ -21,9 +21,15 @@ body {
     overflow: hidden;
 }
 
+/* Utilities */
+.hidden {
+    display: none !important;
+}
+
 #game-container {
     width: 100%;
-    max-width: 500px; /* Mobile first / Portrait feel */
+    max-width: 500px;
+    /* Mobile first / Portrait feel */
     height: 90vh;
     padding: 1rem;
     display: flex;
@@ -43,8 +49,14 @@ header {
     font-weight: 600;
 }
 
-h1 { font-size: 1.5rem; margin: 0; }
-h1 span { color: var(--primary-yellow); }
+h1 {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+h1 span {
+    color: var(--primary-yellow);
+}
 
 #game-stats {
     display: flex;
@@ -54,7 +66,9 @@ h1 span { color: var(--primary-yellow); }
     font-weight: 700;
 }
 
-#location span { color: var(--primary-blue); }
+#location span {
+    color: var(--primary-blue);
+}
 
 #game-viewport {
     flex: 1;
@@ -63,7 +77,8 @@ h1 span { color: var(--primary-yellow); }
     border-radius: 24px;
     position: relative;
     overflow: hidden;
-    perspective: 1200px; /* Increased for deeper view */
+    perspective: 1200px;
+    /* Increased for deeper view */
 }
 
 #road-wrapper {
@@ -73,78 +88,187 @@ h1 span { color: var(--primary-yellow); }
     transform-style: preserve-3d;
 }
 
-#road {
+.road-segment {
     width: 100%;
-    height: 200%; /* Longer road */
+    height: 200%;
     background: #334155;
     position: absolute;
     bottom: -20%;
     left: 0;
-    transform: rotateX(75deg); /* Steeper angle for more perspective */
+    transform: rotateX(75deg);
     transform-origin: bottom;
 }
 
-#horizon {
-    position: absolute;
-    top: 10%; /* Move horizon further back */
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background: var(--primary-blue);
-    box-shadow: 0 0 30px var(--primary-blue);
-    z-index: 5;
-}
-
-/* Road lines */
-#road::before {
-    content: '';
+.road-lines {
     position: absolute;
     top: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 4px;
+    width: 6px;
     height: 100%;
-    background: repeating-linear-gradient(to bottom, transparent, transparent 50px, #fff 50px, #fff 100px);
-    opacity: 0.3;
+    background: repeating-linear-gradient(to bottom, transparent, transparent 60px, rgba(255, 255, 255, 0.4) 60px, rgba(255, 255, 255, 0.4) 120px);
+}
+
+#road-split-l,
+#road-split-r {
+    width: 60%;
+    transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+#road-split-l.highlight {
+    box-shadow: 0 0 40px var(--primary-blue);
+    border-left: 2px solid var(--primary-blue);
+}
+
+#road-split-r.highlight {
+    box-shadow: 0 0 40px var(--primary-green);
+    border-right: 2px solid var(--primary-green);
+}
+
+#road-split-l {
+    transform: rotateX(75deg) rotateY(-20deg) translateX(-60%);
+}
+
+#road-split-r {
+    transform: rotateX(75deg) rotateY(20deg) translateX(60%);
+}
+
+.splitting #road-main {
+    clip-path: polygon(0% 0%, 100% 0%, 100% 60%, 50% 100%, 0% 60%);
+    transition: clip-path 1.5s ease;
+}
+
+#billboard-overlay {
+    position: absolute;
+    top: 15%;
+    left: 0;
+    width: 100%;
+    height: 40%;
+    pointer-events: none;
+    z-index: 500;
+}
+
+.overhead-board {
+    position: absolute;
+    padding: 1.5rem 2rem;
+    background: #1e293b;
+    border: 4px solid var(--primary-yellow);
+    border-radius: 20px;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 800;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    opacity: 0;
+    transform: translateY(-50px) scale(0.8);
+}
+
+.overhead-board.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.board-left {
+    left: 5%;
+}
+
+.board-right {
+    right: 5%;
+}
+
+.lane-arrow {
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 4rem;
+    color: rgba(255, 255, 255, 0.4);
+    pointer-events: none;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.2;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: translateX(-50%) translateY(-20px);
+    }
+
+    100% {
+        opacity: 0.2;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+#nav-feedback {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--primary-red);
+    color: white;
+    padding: 2rem 4rem;
+    font-size: 2rem;
+    font-weight: 800;
+    border-radius: 32px;
+    z-index: 2000;
+    box-shadow: 0 0 50px rgba(234, 67, 53, 0.5);
+    text-transform: uppercase;
 }
 
 #player {
-    width: 50px; /* Increased from 34px */
-    height: 85px; /* Increased from 58px */
+    width: 60px;
+    height: 90px;
     position: absolute;
-    bottom: 30px;
+    bottom: 40px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 100;
+    z-index: 1000;
+    /* Higher z-index */
     transition: left 0.1s linear;
-}
-
-#player::before {
-    content: '🛵'; 
-    font-size: 48px; 
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100%;
-    filter: drop-shadow(0 15px 15px rgba(0,0,0,0.6));
-    transform: rotateY(90deg) rotate(90deg) scale(1.5); /* Added rotateY(90deg) */
-    transform-style: preserve-3d;
 }
 
-#player.moving {
-    transform: translateX(-50%) rotate(5deg);
+#player::before {
+    content: '\1F6F5';
+    /* Scooter emoji Unicode escape */
+    font-size: 50px;
+    filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.6));
+    transform: scale(1.5);
+    display: block;
 }
 
 .vehicle {
     position: absolute;
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    transform: translate(-50%, -100%); /* Adjusted transform */
+    transform: translate(-50%, -100%);
+    /* Adjusted transform */
 }
 
-.rickshaw { background: var(--primary-yellow); border: 2px solid #000; }
-.car { background: var(--primary-red); border: 2px solid #000; }
-.bus { background: var(--primary-green); border: 2px solid #000; }
+.rickshaw {
+    background: var(--primary-yellow);
+    border: 2px solid #000;
+}
+
+.car {
+    background: var(--primary-red);
+    border: 2px solid #000;
+}
+
+.bus {
+    background: var(--primary-green);
+    border: 2px solid #000;
+}
 
 .billboard {
     position: absolute;
@@ -170,8 +294,13 @@ h1 span { color: var(--primary-yellow); }
     margin-bottom: -2px;
 }
 
-.billboard.left { border-color: var(--primary-blue); }
-.billboard.right { border-color: var(--primary-green); }
+.billboard.left {
+    border-color: var(--primary-blue);
+}
+
+.billboard.right {
+    border-color: var(--primary-green);
+}
 
 .fork-line {
     position: absolute;
@@ -188,7 +317,8 @@ h1 span { color: var(--primary-yellow); }
     background: transparent;
 }
 
-.forking::after, .forking::before {
+.forking::after,
+.forking::before {
     content: '';
     position: absolute;
     top: 0;
@@ -198,8 +328,15 @@ h1 span { color: var(--primary-yellow); }
     transition: transform 1s ease;
 }
 
-.forking::before { left: 40%; transform: rotate(-5deg); }
-.forking::after { right: 40%; transform: rotate(5deg); }
+.forking::before {
+    left: 40%;
+    transform: rotate(-5deg);
+}
+
+.forking::after {
+    right: 40%;
+    transform: rotate(5deg);
+}
 
 #controls {
     margin-top: 1rem;
@@ -232,15 +369,24 @@ h1 span { color: var(--primary-yellow); }
 }
 
 #pause-btn {
-    background: var(--primary-blue);
+    background: rgba(255, 255, 255, 0.1);
     color: white;
-    border: none;
-    padding: 0.4rem 1rem;
-    border-radius: 8px;
-    font-weight: 700;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
     cursor: pointer;
+    transition: all 0.2s ease;
     margin-top: 0.5rem;
-    font-size: 0.8rem;
+}
+
+#pause-btn:hover {
+    background: var(--primary-blue);
+    transform: scale(1.1);
 }
 
 #pause-menu {
@@ -249,7 +395,8 @@ h1 span { color: var(--primary-yellow); }
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(15, 23, 42, 0.85); /* Slightly lighter blur */
+    background: rgba(15, 23, 42, 0.85);
+    /* Slightly lighter blur */
     backdrop-filter: blur(10px);
     display: flex;
     justify-content: center;
@@ -269,7 +416,9 @@ h1 span { color: var(--primary-yellow); }
     font-size: 1.1rem;
 }
 
-#pause-menu.hidden { display: none !important; }
+#pause-menu.hidden {
+    display: none !important;
+}
 
 #restart-btn {
     background: var(--primary-red);
@@ -288,4 +437,6 @@ h1 span { color: var(--primary-yellow); }
     transform: scale(1.05);
 }
 
-#game-over.hidden { display: none !important; }
+#game-over.hidden {
+    display: none !important;
+}
