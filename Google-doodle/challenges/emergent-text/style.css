@@ -1,6 +1,7 @@
 :root {
     --primary-yellow: #fbbc05;
     --bg-dark: #0f172a;
+    --card-bg: #1e293b;
     --text-main: #f8fafc;
     --text-sub: #94a3b8;
     --font-outfit: 'Outfit', sans-serif;
@@ -113,21 +114,18 @@ h1 span {
     color: white;
 }
 
-@keyframes slideIn {
+@keyframes slide-in {
     from { transform: translateX(30px); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
 }
 
 .animate-slide-in {
-    animation: slideIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    animation: slide-in 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
 #controls {
     margin-top: 2rem;
 }
-
-/* ... existing styles ... */
-
 #toggle-btn {
     background: var(--primary-yellow);
     color: #000;

@@ -46,7 +46,9 @@ h1 {
 
 h1 span {
     background: linear-gradient(135deg, var(--primary-blue), var(--primary-green), var(--primary-red), var(--primary-yellow));
+    background-clip: text;
     -webkit-background-clip: text;
+    color: transparent;
     -webkit-text-fill-color: transparent;
 }
 

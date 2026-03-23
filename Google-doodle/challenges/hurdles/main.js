@@ -20,6 +20,8 @@ let nextMilestone = 1000;
 let vehicles = [];
 let keys = {};
 let gameLoopId = null;
+let lastFrameTime = performance.now();
+let currentGameTime = 0;
 let isJunctionActive = false;
 let junctionDecisionMade = false;
 let roadSplitLEl = document.getElementById('road-split-l');
@@ -60,17 +62,28 @@ const JunctionManager = {
     options: [],
     timer: 0,
     isInputLocked: false,
+    _timerIdCounter: 0,
     _pendingTimers: [],
 
     _setTimeout(fn, ms) {
-        const id = setTimeout(fn, ms);
-        this._pendingTimers.push(id);
-        return id;
+        this._timerIdCounter++;
+        const targetTime = currentGameTime + ms;
+        this._pendingTimers.push({ id: this._timerIdCounter, target: targetTime, fn });
+        return this._timerIdCounter;
+    },
+
+    _clearTimeout(id) {
+        this._pendingTimers = this._pendingTimers.filter(t => t.id !== id);
     },
 
     clearTimers() {
-        this._pendingTimers.forEach(clearTimeout);
         this._pendingTimers = [];
+    },
+
+    processTimers(currentTime) {
+        const expired = this._pendingTimers.filter(t => currentTime >= t.target);
+        this._pendingTimers = this._pendingTimers.filter(t => currentTime < t.target);
+        expired.forEach(t => t.fn());
     },
 
     spawn() {
@@ -82,7 +95,10 @@ const JunctionManager = {
         this.state = 'PREVIEW';
         isJunctionActive = true;
         const options = roadMap[currentCity] || ['MG Road', 'Indiranagar'];
-        this.options = [options[0], options[Math.min(1, options.length - 1)]];
+        
+        // Pick two distinct options
+        const shuffled = [...options].sort(() => 0.5 - Math.random());
+        this.options = [shuffled[0], shuffled[1] || shuffled[0]];
         
         this.showBoards();
         // Preview phase: show boards early, narrow road
@@ -104,7 +120,7 @@ const JunctionManager = {
     enterDecision() {
         this.state = 'DECISION';
         this.isInputLocked = true;
-        this.timer = 0; 
+        this.decisionEndTime = currentGameTime + 800; // 800ms window
         // Ensure player is centered for the fork
         playerX = 50;
         player.style.left = '50%';
@@ -120,9 +136,8 @@ const JunctionManager = {
     update() {
         if (this.state !== 'DECISION') return;
         
-        this.timer += 1;
-        // Enforce 800ms decision window (~48 frames at 60fps)
-        if (this.timer > 48) {
+        // Enforce 800ms decision window via target time
+        if (currentGameTime > this.decisionEndTime) {
             this.fail("Too Late!");
         }
     },
@@ -161,7 +176,7 @@ const JunctionManager = {
         } else {
             locationEl.innerHTML = `From: <b>${currentCity}</b><br>To: <b style="color:var(--primary-red)">${targetCity}</b>`;
             speed += 0.5;
-            nextMilestone += 1500;
+            nextMilestone = score + 1500;
             this.reset();
         }
     },
@@ -248,10 +263,20 @@ function initGame() {
     nextMilestone = 400; // Lowered for faster testing
     JunctionManager.reset();
     
+    // Reset Global Time Clock
+    lastFrameTime = performance.now();
+    currentGameTime = 0;
+
     // Clear UI
     scoreEl.textContent = 0;
     gameOverEl.classList.add('hidden');
     pauseMenuEl.classList.add('hidden');
+
+    const modalTitle = gameOverEl.querySelector('h2');
+    if (modalTitle) {
+        modalTitle.textContent = "Game Over";
+        modalTitle.style.color = "var(--primary-red)";
+    }
     
     // Clear existing objects
     vehicles.forEach(v => v.element.remove());
@@ -261,15 +286,15 @@ function initGame() {
     gameLoopId = requestAnimationFrame(updateGame);
 }
 
-function updatePlayer() {
+function updatePlayer(timeScale) {
     if (JunctionManager.isInputLocked || isJunctionActive) return;
     let moving = false;
     if (keys['ArrowLeft'] || keys['KeyA']) {
-        playerX -= 2.0;
+        playerX -= 2.0 * timeScale;
         moving = true;
     }
     if (keys['ArrowRight'] || keys['KeyD']) {
-        playerX += 2.0;
+        playerX += 2.0 * timeScale;
         moving = true;
     }
     
@@ -321,18 +346,32 @@ function spawnVehicle() {
     vehicles.push(vehicle);
 }
 
-function updateGame() {
+function updateGame(timestamp) {
     if (!gameActive || isGameOver) {
-        gameLoopId = null;
+        lastFrameTime = performance.now(); // Clock stops advancing but references continue
+        gameLoopId = requestAnimationFrame(updateGame);
         return;
     }
 
-    score += 1;
+    if (!timestamp) timestamp = performance.now();
+    let delta = timestamp - lastFrameTime;
+    lastFrameTime = timestamp;
+
+    if (delta > 100) delta = 16.6; // Lag spike protection
+    const timeScale = delta / 16.666;
+    currentGameTime += delta;
+
+    JunctionManager.processTimers(currentGameTime);
+
+    // Track score progression to know when crossing thresholds
+    const prevScore = score;
+    score += timeScale;
     scoreEl.textContent = Math.floor(score / 10);
 
-    // if (score % 60 === 0 && !isJunctionActive) spawnVehicle();
+    // Process timeouts and junctions
+    if (Math.floor(score / 60) > Math.floor(prevScore / 60) && !isJunctionActive) spawnVehicle();
     
-    if (score > 0 && score % nextMilestone === 0 && !isJunctionActive) {
+    if (score > 0 && score >= nextMilestone && prevScore < nextMilestone && !isJunctionActive) {
         JunctionManager.spawn();
     }
 
@@ -343,7 +382,7 @@ function updateGame() {
     // Vehicles
     const visibleVehicles = [];
     vehicles.forEach((v) => {
-        v.y += v.speed * 0.45;
+        v.y += v.speed * 0.45 * timeScale;
         const scale = (v.y - 100) / 400 + 0.1;
         
         v.element.style.top = v.y + 'px';
@@ -378,7 +417,7 @@ function updateGame() {
     });
     vehicles = visibleVehicles;
 
-    updatePlayer();
+    updatePlayer(timeScale);
     gameLoopId = requestAnimationFrame(updateGame);
 }
 

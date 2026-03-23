@@ -17,6 +17,10 @@ function createGhost() {
     const ghost = document.createElement('div');
     ghost.className = 'ghost';
     
+    const inner = document.createElement('div');
+    inner.className = 'ghost-inner';
+    ghost.appendChild(inner);
+    
     // Random Position
     const rect = scene.getBoundingClientRect();
     const x = Math.random() * (rect.width - 60);

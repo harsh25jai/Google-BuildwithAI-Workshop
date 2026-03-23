@@ -1,11 +1,18 @@
 const canvas = document.getElementById('gameCanvas');
+if (!canvas) throw new Error("Missing #gameCanvas");
 const ctx = canvas.getContext('2d');
 const runsEl = document.getElementById('runs');
+if (!runsEl) throw new Error("Missing #runs");
 const wicketsEl = document.getElementById('wickets');
+if (!wicketsEl) throw new Error("Missing #wickets");
 const swingBtn = document.getElementById('swing-btn');
+if (!swingBtn) throw new Error("Missing #swing-btn");
 const gameOverEl = document.getElementById('game-over');
+if (!gameOverEl) throw new Error("Missing #game-over");
 const finalScoreEl = document.getElementById('final-score');
+if (!finalScoreEl) throw new Error("Missing #final-score");
 const restartBtn = document.getElementById('restart-btn');
+if (!restartBtn) throw new Error("Missing #restart-btn");
 
 // Canvas setup
 canvas.width = 700;
@@ -17,6 +24,7 @@ let wickets = 0;
 let isGameOver = false;
 let isSwinging = false;
 let ballActive = false;
+let ballSpawnScheduled = false;
 let ball = { x: 0, y: 0, speed: 5, radius: 8 };
 let batter = { x: 600, y: 350, angle: 0 };
 let pitcher = { x: 50, y: 200 };
@@ -80,15 +88,19 @@ function draw() {
         }
     } else if (!isGameOver) {
         // Reset Ball
-        setTimeout(() => {
-            if (!ballActive && !isGameOver) spawnBall();
-        }, 1500);
+        if (!ballSpawnScheduled) {
+            ballSpawnScheduled = true;
+            setTimeout(() => {
+                if (!ballActive && !isGameOver) spawnBall();
+            }, 1500);
+        }
     }
 
     requestAnimationFrame(draw);
 }
 
 function spawnBall() {
+    ballSpawnScheduled = false;
     ballActive = true;
     ball.x = pitcher.x;
     ball.y = pitcher.y;
@@ -167,13 +179,18 @@ function restartGame() {
     runsEl.textContent = 0;
     wicketsEl.textContent = 0;
     isGameOver = false;
+    ballSpawnScheduled = false;
     gameOverEl.classList.add('hidden');
+    spawnBall();
     draw();
 }
 
 swingBtn.addEventListener('click', swing);
 window.addEventListener('keydown', (e) => {
-    if (e.code === 'Space') swing();
+    if (e.code === 'Space') {
+        e.preventDefault();
+        swing();
+    }
 });
 restartBtn.addEventListener('click', restartGame);
 

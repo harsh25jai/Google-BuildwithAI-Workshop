@@ -4,11 +4,11 @@ description: Creating algorithmic art using p5.js with seeded randomness and int
 license: Complete terms in LICENSE.txt
 ---
 
-Algorithmic philosophies are computational aesthetic movements that are then expressed through code. Output .md files (philosophy), .html files (interactive viewer), and .js files (generative algorithms).
+Algorithmic philosophies are computational aesthetic movements that are then expressed through code. Output a single self-contained .html file (with embedded p5.js script) for the interactive art, plus a separate .md file for the philosophy.
 
 This happens in two steps:
 1. Algorithmic Philosophy Creation (.md file)
-2. Express by creating p5.js generative art (.html + .js files)
+2. Express by creating p5.js generative art (single self-contained .html file)
 
 First, undertake this task:
 
@@ -21,7 +21,7 @@ To begin, create an ALGORITHMIC PHILOSOPHY (not static images or templates) that
 - Parametric variation and controlled chaos
 
 ### THE CRITICAL UNDERSTANDING
-- What is received: Some subtle input or instructions by the user to take into account, but use as a foundation; it should not constrain creative freedom.
+- What is received: Some subtle input or instructions by the user to consider, but use as a foundation; it should not constrain creative freedom.
 - What is created: An algorithmic philosophy/generative aesthetic movement.
 - What happens next: The same version receives the philosophy and EXPRESSES IT IN CODE - creating p5.js sketches that are 90% algorithmic generation, 10% essential parameters.
 
@@ -46,7 +46,7 @@ To capture the ALGORITHMIC essence, express how this philosophy manifests throug
 
 **CRITICAL GUIDELINES:**
 - **Avoid redundancy**: Each algorithmic aspect should be mentioned once. Avoid repeating concepts about noise theory, particle dynamics, or mathematical principles unless adding new depth.
-- **Emphasize craftsmanship REPEATEDLY**: The philosophy MUST stress multiple times that the final algorithm should appear as though it took countless hours to develop, was refined with care, and comes from someone at the absolute top of their field. This framing is essential - repeat phrases like "meticulously crafted algorithm," "the product of deep computational expertise," "painstaking optimization," "master-level implementation."
+- **Emphasize craftsmanship**: The philosophy MUST require that the algorithmic description convey meticulous, master-level craftsmanship once.
 - **Leave creative space**: Be specific about the algorithmic direction, but concise enough that the next Claude has room to make interpretive implementation choices at an extremely high level of craftsmanship.
 
 The philosophy must guide the next version to express ideas ALGORITHMICALLY, not through static images. Beauty lives in the process, not the final frame.
@@ -107,9 +107,9 @@ With the philosophy AND conceptual framework established, express it through cod
 **CRITICAL: BEFORE writing any HTML:**
 
 1. **Read** `templates/viewer.html` using the Read tool
-2. **Study** the exact structure, styling, and Anthropic branding
-3. **Use that file as the LITERAL STARTING POINT** - not just inspiration
-4. **Keep all FIXED sections exactly as shown** (header, sidebar structure, Anthropic colors/fonts, seed controls, action buttons)
+2. **Study** the exact structure and styling
+3. **Use that file as the starting template**
+4. **Preserve header/sidebar structure, colors/fonts as provided or project-appropriate equivalents** (seed controls, action buttons)
 5. **Replace only the VARIABLE sections** marked in the file's comments (algorithm, parameters, UI controls for parameters)
 
 **Avoid:**
@@ -120,7 +120,7 @@ With the philosophy AND conceptual framework established, express it through cod
 
 **Follow these practices:**
 - ✅ Copy the template's exact HTML structure
-- ✅ Keep Anthropic branding (Poppins/Lora fonts, light colors, gradient backdrop)
+- ✅ Preserve template structure, colors, and fonts (or project-appropriate equivalents)
 - ✅ Maintain the sidebar layout (Seed → Parameters → Colors? → Actions)
 - ✅ Replace only the p5.js algorithm and parameter controls
 
@@ -230,7 +230,7 @@ The `templates/viewer.html` file is the foundation. It contains the exact struct
 
 **FIXED (always include exactly as shown):**
 - Layout structure (header, sidebar, main canvas area)
-- Anthropic branding (UI colors, fonts, gradients)
+- Template styling (structure, colors, fonts, gradients as provided)
 - Seed section in sidebar:
   - Seed display
   - Previous/Next buttons
@@ -333,7 +333,7 @@ Add as many control-group divs as there are parameters.
 - Seed controls must work (prev/next/random/jump/display)
 - All parameters must have UI controls
 - Regenerate, Reset, Download buttons must work
-- Keep Anthropic branding (UI styling, not art colors)
+- Keep template styling (structure, colors, fonts, layout, not art colors)
 
 ### USING THE ARTIFACT
 
@@ -369,7 +369,7 @@ Each request is unique. The process involves:
 5. **Build matching UI controls** - Sliders/inputs for those parameters
 
 **The constants**:
-- Anthropic branding (colors, fonts, layout)
+- Template styling (colors, fonts, layout structure)
 - Seed navigation (always present)
 - Self-contained HTML artifact
 
@@ -388,8 +388,8 @@ To achieve the best results, trust creativity and let the philosophy guide the i
 This skill includes helpful templates and documentation:
 
 - **templates/viewer.html**: REQUIRED STARTING POINT for all HTML artifacts.
-  - This is the foundation - contains the exact structure and Anthropic branding
-  - **Keep unchanged**: Layout structure, sidebar organization, Anthropic colors/fonts, seed controls, action buttons
+  - This is the foundation - contains the exact structure required
+  - **Keep unchanged**: Layout structure, sidebar organization, structural colors/fonts, seed controls, action buttons
   - **Replace**: The p5.js algorithm, parameter definitions, and UI controls in Parameters section
   - The extensive comments in the file mark exactly what to keep vs replace
 
@@ -402,4 +402,4 @@ This skill includes helpful templates and documentation:
 - The **template is the STARTING POINT**, not inspiration
 - The **algorithm is where to create** something unique
 - Don't copy the flow field example - build what the philosophy demands
-- But DO keep the exact UI structure and Anthropic branding from the template
+- But DO keep the exact UI structure and styling from the template

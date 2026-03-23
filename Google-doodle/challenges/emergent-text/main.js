@@ -101,6 +101,8 @@ function init() {
     ctx.fillStyle = 'white';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
+    ctx.globalAlpha = 1.0;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     // Clear and set description
     modeDesc.textContent = textMode ? descriptions.text : descriptions.logo;
