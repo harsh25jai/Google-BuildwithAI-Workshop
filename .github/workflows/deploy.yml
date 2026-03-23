@@ -13,6 +13,9 @@ concurrency:
   group: "pages"
   cancel-in-progress: true
 
+env:
+  LIVE_URL: "https://harsh25jai.github.io/Google-BuildwithAI-Workshop/"
+
 jobs:
   build:
     name: Build
@@ -52,7 +55,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     environment:
       name: github-pages
-      url: https://harsh25jai.github.io/Google-BuildwithAI-Workshop/
+      url: ${{ env.LIVE_URL }}
 
     steps:
       - name: Download artifact
@@ -68,4 +71,4 @@ jobs:
           publish_dir: ./dist
 
       - name: Display Live URL
-        run: echo "🚀 Application successfully deployed to https://harsh25jai.github.io/Google-BuildwithAI-Workshop/"
+        run: echo "🚀 Application successfully deployed to ${{ env.LIVE_URL }}"

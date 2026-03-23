@@ -4,6 +4,19 @@ This project was created as part of the **Google Build with AI RoadShows: Bengal
 
 ## Project Setup
 
+### Prerequisites
+
+Ensure you have the appropriate runtime and package manager installed before proceeding:
+- **Node.js**: v16.14.0 or higher (v18.x or v20.x recommended)
+- **npm**: v8.x or higher
+
+To check your current versions, run the following commands:
+```bash
+node -v
+npm -v
+```
+You can download Node.js from [nodejs.org](https://nodejs.org/).
+
 This project is built using [Vite](https://vitejs.dev/). To get started locally, follow these steps:
 
 1. **Install Dependencies**
