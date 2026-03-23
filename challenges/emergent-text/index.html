@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doodle Emergent Art - Google Doodle Challenges</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  <script type="module" crossorigin src="/Google-BuildwithAI-Workshop/assets/emergent-BTsQIE7O.js"></script>
+  <link rel="modulepreload" crossorigin href="/Google-BuildwithAI-Workshop/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="stylesheet" crossorigin href="/Google-BuildwithAI-Workshop/assets/emergent-DKK_hHgb.css">
+</head>
+<body>
+    <div id="game-container">
+        <header>
+            <a href="/" class="back-link">← Back</a>
+            <h1>Doodle <span>Art</span></h1>
+            <p id="mode-description">Particles are currently forming the Antigravity Logo.</p>
+            <p>Wait for the particles to align...</p>
+        </header>
+
+        <div id="art-layout">
+            <canvas id="artCanvas"></canvas>
+            
+            <div id="config-panel" class="animate-slide-in">
+                <h3>Configuration</h3>
+                <div class="control-group">
+                    <label for="input-seeds">Particles (Density)</label>
+                    <input type="range" id="input-seeds" min="2" max="10" step="1" value="6">
+                </div>
+                <div class="control-group">
+                    <label for="input-gravity">Gravity</label>
+                    <input type="range" id="input-gravity" min="0" max="1" step="0.05" value="0.5">
+                </div>
+                <div class="control-group">
+                    <label for="input-speed">Speed</label>
+                    <input type="range" id="input-speed" min="1" max="20" step="1" value="10">
+                </div>
+                <div class="control-group">
+                    <label for="input-noise">Noise</label>
+                    <input type="range" id="input-noise" min="0" max="50" step="1" value="10">
+                </div>
+                <button id="reset-btn">Reset Defaults</button>
+            </div>
+        </div>
+
+        <div id="controls">
+            <button id="toggle-btn">Switch Mode</button>
+            <p>Move your mouse to disturb the particles, or adjust the settings above!</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doodle Cricket - Google Doodle Challenges</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  <script type="module" crossorigin src="/Google-BuildwithAI-Workshop/assets/cricket-B9h7TYnC.js"></script>
+  <link rel="modulepreload" crossorigin href="/Google-BuildwithAI-Workshop/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="stylesheet" crossorigin href="/Google-BuildwithAI-Workshop/assets/cricket-D1_T0Hpu.css">
+</head>
+<body>
+    <div id="game-container">
+        <header>
+            <a href="/" class="back-link">← Back</a>
+            <h1>Doodle <span>Cricket</span></h1>
+            <div id="score-board">
+                <div class="score-item">Runs: <span id="runs">0</span></div>
+                <div class="score-item">Wickets: <span id="wickets">0</span></div>
+            </div>
+        </header>
+
+        <canvas id="gameCanvas"></canvas>
+
+        <div id="controls">
+            <button id="swing-btn">SWING BAT</button>
+            <p>Click the button or press SPACE to swing!</p>
+        </div>
+
+        <div id="game-over" class="hidden">
+            <h2>Game Over!</h2>
+            <p>Your Final Score: <span id="final-score">0</span></p>
+            <button id="restart-btn">Try Again</button>
+        </div>
+    </div>
+</body>
+</html>
