@@ -26,7 +26,7 @@ let isSwinging = false;
 let ballActive = false;
 let ballSpawnScheduled = false;
 let ball = { x: 0, y: 0, speed: 5, radius: 8 };
-let batter = { x: 600, y: 220, angle: 0 };
+let batter = { x: 600, y: 250, angle: 0 };
 let pitcher = { x: 50, y: 200 };
 
 // Game Loop
@@ -59,10 +59,73 @@ function draw() {
 
     // Draw Batter
     ctx.save();
+
+    // Handle is pivot
     ctx.translate(batter.x, batter.y);
     ctx.rotate(batter.angle);
-    ctx.fillStyle = '#34a853';
-    ctx.fillRect(-10, -50, 20, 60); // Bat
+
+    // Wood gradient
+    let grad = ctx.createLinearGradient(-16, -80, 16, 0);
+    grad.addColorStop(0, '#c89b6d');
+    grad.addColorStop(0.5, '#e0b07a');
+    grad.addColorStop(1, '#c89b6d');
+
+    ctx.fillStyle = grad;
+    ctx.strokeStyle = '#8b5a2b';
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+
+    // ===== Handle (starts at origin) =====
+    ctx.moveTo(-4, 0);
+    ctx.lineTo(4, 0);
+    ctx.lineTo(6, -20);
+    ctx.lineTo(-6, -20);
+
+    // ===== Shoulders =====
+    ctx.quadraticCurveTo(-12, -30, -14, -45);
+
+    // ===== Blade =====
+    ctx.lineTo(-16, -70);
+    ctx.quadraticCurveTo(0, -85, 16, -70);
+    ctx.lineTo(14, -45);
+    ctx.quadraticCurveTo(12, -30, 6, -20);
+
+    ctx.closePath();
+
+    ctx.fill();
+    ctx.stroke();
+
+    // ===== FIXED GRIP =====
+    ctx.fillStyle = '#222';
+
+    // Rounded grip using path (instead of fillRect)
+    ctx.beginPath();
+    ctx.moveTo(-5, 0);
+    ctx.lineTo(5, 0);
+    ctx.lineTo(5, -18);
+    ctx.quadraticCurveTo(0, -22, -5, -18);
+    ctx.closePath();
+    ctx.fill();
+
+    // Grip texture lines
+    ctx.strokeStyle = '#555';
+    ctx.lineWidth = 1;
+
+    for (let i = -3; i > -18; i -= 4) {
+        ctx.beginPath();
+        ctx.moveTo(-4, i);
+        ctx.lineTo(4, i);
+        ctx.stroke();
+    }
+
+    // ===== Spine =====
+    ctx.beginPath();
+    ctx.moveTo(0, -20);
+    ctx.lineTo(0, -75);
+    ctx.strokeStyle = '#a67c52';
+    ctx.stroke();
+
     ctx.restore();
 
     // Draw Ball
