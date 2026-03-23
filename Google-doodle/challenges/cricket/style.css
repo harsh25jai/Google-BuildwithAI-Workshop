@@ -1,0 +1,135 @@
+:root {
+    --primary-blue: #4285f4;
+    --bg-dark: #0f172a;
+    --card-bg: #1e293b;
+    --text-main: #f8fafc;
+    --text-sub: #94a3b8;
+    --font-outfit: 'Outfit', sans-serif;
+}
+
+body {
+    margin: 0;
+    font-family: var(--font-outfit);
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+#game-container {
+    width: 100%;
+    max-width: 800px;
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.back-link {
+    color: var(--text-sub);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+h1 span {
+    color: var(--primary-blue);
+}
+
+#score-board {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.score-item {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+#gameCanvas {
+    background: #1e293b;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 700px;
+    height: 400px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    margin: 0 auto;
+    display: block;
+}
+
+#controls {
+    margin-top: 2rem;
+}
+
+#swing-btn {
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: 1rem 3rem;
+    font-size: 1.5rem;
+    font-weight: 800;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 5px 15px rgba(66, 133, 244, 0.4);
+}
+
+#swing-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(66, 133, 244, 0.6);
+}
+
+#swing-btn:active {
+    transform: scale(0.95);
+}
+
+#controls p {
+    margin-top: 1rem;
+    color: var(--text-sub);
+}
+
+#game-over {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(30, 41, 59, 0.95);
+    padding: 3rem;
+    border-radius: 24px;
+    border: 2px solid var(--primary-blue);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+}
+
+.hidden {
+    display: none;
+}
+
+#game-over h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+#restart-btn {
+    background: white;
+    color: var(--bg-dark);
+    border: none;
+    padding: 0.8rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-top: 1.5rem;
+}
+
+@keyframes fadeUp {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -100%) scale(1.5); }
+}
