@@ -26,7 +26,7 @@ let isSwinging = false;
 let ballActive = false;
 let ballSpawnScheduled = false;
 let ball = { x: 0, y: 0, speed: 5, radius: 8 };
-let batter = { x: 600, y: 350, angle: 0 };
+let batter = { x: 600, y: 220, angle: 0 };
 let pitcher = { x: 50, y: 200 };
 
 // Game Loop
@@ -39,7 +39,6 @@ function draw() {
     // Draw Ground
     ctx.fillStyle = '#1e293b';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
     // Draw Pitch
     ctx.fillStyle = '#94a3b8';
     ctx.fillRect(50, 180, 600, 40);
@@ -48,8 +47,8 @@ function draw() {
     ctx.strokeStyle = '#f8fafc';
     ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.moveTo(640, 330);
-    ctx.lineTo(640, 380);
+    ctx.moveTo(640, 170);
+    ctx.lineTo(640, 230);
     ctx.stroke();
 
     // Draw Pitcher
@@ -75,7 +74,7 @@ function draw() {
 
         // Move Ball
         ball.x += ball.speed;
-        ball.y += (350 - 200) / ((600 - 50) / ball.speed); // Linear path to batter
+        ball.y += (200 - 200) / ((600 - 50) / ball.speed); // Linear path to batter
 
         // Check Hit
         if (isSwinging && ball.x > batter.x - 40 && ball.x < batter.x + 20 && ball.y > batter.y - 60 && ball.y < batter.y) {
