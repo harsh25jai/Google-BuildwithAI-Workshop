@@ -2,38 +2,38 @@ We are going to create 4 interactive google doodle challenges
 
 We must have a main page having tiles with mentioned challenges
 
-1. Doodle Cricket - Swing the bat and scoew as many runs as you can in the minimialist cricket game
+1. Doodle Cricket - Swing the bat and score as many runs as you can in the minimalist cricket game
 2. Doodle Ghost - A spooky interactive interaction perfect for a halloween vibe
-3. Doodle Hurdles - Test your reflexes in this face paced race over hurdles
-4. Doodle Emergent Text - Create Text Art using algorithmic-art skill making ANITGRAVITY text and ANITGRAVITY LOGO
+3. Doodle Hurdles - Test your reflexes in this fast paced race over hurdles
+4. Doodle Emergent Text - Create Text Art using algorithmic-art skill making ANTIGRAVITY text and ANTIGRAVITY LOGO
 
 
 2nd Phase - 
-Will focus on Emergent text, in this we will configuration, from where we can config seeds, gravity, speed, noise and handle how the emergent text moves
+Will focus on Emergent text, in this we will configure, from where we can config seeds, gravity, speed, noise and handle how the emergent text moves
 
 3 Phase - 
-In Emergent text, if I tap switch to text I don't understand what it exactly does, as no text is visibile write up some desciptions for each mode for easier understanding
+In Emergent text, if I tap switch to text I don't understand what it exactly does, as no text is visible write up some descriptions for each mode for easier understanding
 
 4 Phase - 
-reset default should result in making of text or logo, to easily show, as changing configs making art get disturbed and not creating what's its intendednt to create.
+reset default should result in making of text or logo, to easily show, as changing configs making art get disturbed and not creating what's its intended to create.
 
-Also increaing particle density bar is decreasing number of particles less and decresing increaing number of particles
+Also increasing particle density bar is decreasing number of particles less and decreasing increasing number of particles
 
-increaing the bar means moving the slider towards right, decreasing means moving the slider towards the left 
+increasing the bar means moving the slider to the right, decreasing means moving it to the left 
 
 5 Phase - 
-now focus on hurdles, let use any sprite showing human going through banglore doging traffic, every game should bring a new challenge like going the "vidhan sabha", "church street", user can be spawn to any random position and there should be multiple ways shown, user must pick right navigation to finish the challenge
+now focus on hurdles, let use any sprite showing human going through Bangalore dodging traffic, every game should bring a new challenge like going the "vidhan sabha", "church street", user can be spawn to any random position and there should be multiple ways shown, user must pick right navigation to finish the challenge
 
 6 Phase - 
 Rather than showing dialog box to choose ways, show divergent roads (cross-roads), add billboards to show which goes which, rather than this being 3 lane make it 1 lane, make player slimer and traffic vehicles variable in dimensions. 
 
 7th Phase - 
 Check for errors in code, Stuck in traffic alert box is constant, try again does not close the box
-Make it tpp - Third-Person Perspective, so I can see road long ahead, make it mobile first view
+Make it TPP - Third-Person Perspective, so I can see road long ahead, make it mobile first view
 
 8th Phase
 I cannot see the player object, also as the vehicles come closer to player it overlap one another, mainted a particular distance to avoid colliding vehicles with one another
-check google map for banglore, find populor spots and locations, pick 10-12 locations, create a graph map of navigating to these location from 1 another ensure the navigations(turns) are acurate and aligned, player can be spawn to any random location, and a random location is destination, user has to navigate to that location, avoiding traffic and hurdles
+check google map for Bangalore, find popular spots and locations, pick 10-12 locations, create a graph map of navigating to these location from 1 another ensure the navigations(turns) are accurate and aligned, player can be spawn to any random location, and a random location is destination, user has to navigate to that location, avoiding traffic and hurdles
 
 9. rotate player sprite by 90 degree and increase scale by 150%, still traffic vehicles are colliding and overlaping with one another user sprite or them as well, maintain same scale for 1 sprite
 
