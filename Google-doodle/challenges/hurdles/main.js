@@ -436,6 +436,10 @@ function winGame() {
     document.querySelector('#game-over h2').style.color = "var(--primary-green)";
     finalScoreEl.textContent = Math.floor(score / 10);
     gameOverEl.classList.remove('hidden');
+    if (gameLoopId) {
+        cancelAnimationFrame(gameLoopId);
+        gameLoopId = null;
+    }
 }
 
 // Controls
@@ -485,6 +489,10 @@ pauseBtn.addEventListener('click', () => {
     if (gameActive && !isGameOver) {
         gameActive = false;
         pauseMenuEl.classList.remove('hidden');
+        if (gameLoopId) {
+            cancelAnimationFrame(gameLoopId);
+            gameLoopId = null;
+        }
     }
 });
 
@@ -492,7 +500,10 @@ resumeBtn.addEventListener('click', () => {
     if (!gameActive && !isGameOver) {
         gameActive = true;
         pauseMenuEl.classList.add('hidden');
-        gameLoopId = requestAnimationFrame(updateGame);
+        lastFrameTime = performance.now(); // Reset time reference before resuming
+        if (!gameLoopId) {
+            gameLoopId = requestAnimationFrame(updateGame);
+        }
     }
 });
 

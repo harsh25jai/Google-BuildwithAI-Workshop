@@ -1,6 +1,7 @@
 const canvas = document.getElementById('gameCanvas');
 if (!canvas) throw new Error("Missing #gameCanvas");
 const ctx = canvas.getContext('2d');
+if (!ctx) throw new Error("Missing 2d context from canvas");
 const runsEl = document.getElementById('runs');
 if (!runsEl) throw new Error("Missing #runs");
 const wicketsEl = document.getElementById('wickets');
@@ -13,6 +14,8 @@ const finalScoreEl = document.getElementById('final-score');
 if (!finalScoreEl) throw new Error("Missing #final-score");
 const restartBtn = document.getElementById('restart-btn');
 if (!restartBtn) throw new Error("Missing #restart-btn");
+const gameContainer = document.getElementById('game-container');
+if (!gameContainer) throw new Error("Missing #game-container");
 
 // Canvas setup
 canvas.width = 700;
@@ -137,7 +140,7 @@ function draw() {
 
         // Move Ball
         ball.x += ball.speed;
-        ball.y += (200 - 200) / ((600 - 50) / ball.speed); // Linear path to batter
+        ball.y += ((batter.y - 50) - pitcher.y) / ((batter.x - pitcher.x) / ball.speed); // Linear path to batter
 
         // Check Hit
         if (isSwinging && ball.x > batter.x - 40 && ball.x < batter.x + 20 && ball.y > batter.y - 60 && ball.y < batter.y) {
@@ -225,7 +228,7 @@ function showNotification(text, color) {
     note.style.color = color;
     note.style.pointerEvents = 'none';
     note.style.animation = 'fadeUp 1s forwards';
-    document.getElementById('game-container').appendChild(note);
+    gameContainer.appendChild(note);
     setTimeout(() => note.remove(), 1000);
 }
 
@@ -256,15 +259,6 @@ window.addEventListener('keydown', (e) => {
 });
 restartBtn.addEventListener('click', restartGame);
 
-// Add animation style
-const style = document.createElement('style');
-style.textContent = `
-@keyframes fadeUp {
-    0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    100% { opacity: 0; transform: translate(-50%, -100%) scale(1.5); }
-}
-`;
-document.head.appendChild(style);
 
-draw();
 spawnBall();
+draw();

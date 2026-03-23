@@ -63,10 +63,17 @@ class Particle {
         let dx = mouse.x - this.x;
         let dy = mouse.y - this.y;
         let distance = Math.sqrt(dx * dx + dy * dy);
-        let forceDirectionX = dx / distance;
-        let forceDirectionY = dy / distance;
-        let maxDistance = mouse.radius;
-        let mouseForce = (maxDistance - distance) / maxDistance;
+        
+        let forceDirectionX = 0;
+        let forceDirectionY = 0;
+        let mouseForce = 0;
+        
+        if (distance > 0) {
+            forceDirectionX = dx / distance;
+            forceDirectionY = dy / distance;
+            let maxDistance = mouse.radius;
+            mouseForce = (maxDistance - distance) / maxDistance;
+        }
         
         // Return to Base Force (Gravity/Speed)
         let dxBase = this.baseX - this.x;
@@ -160,7 +167,7 @@ toggleBtn.addEventListener('click', () => {
 });
 
 inputSeeds.addEventListener('input', (e) => {
-    config.seeds = e.target.value;
+    config.seeds = parseInt(e.target.value, 10) || 6;
     init(); // Re-initialize particles with new density
 });
 
