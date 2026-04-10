@@ -101,10 +101,25 @@ header p {
     background: linear-gradient(to top, var(--card-bg), transparent);
 }
 
-.cricket-bg { background-color: var(--primary-blue); background-image: linear-gradient(135deg, #1e3a8a, #4285f4); }
-.ghost-bg { background-color: var(--primary-red); background-image: linear-gradient(135deg, #7f1d1d, #ea4335); }
-.hurdles-bg { background-color: var(--primary-green); background-image: linear-gradient(135deg, #064e3b, #34a853); }
-.emergent-bg { background-color: var(--primary-yellow); background-image: linear-gradient(135deg, #78350f, #fbbc05); }
+.cricket-bg {
+    background-color: var(--primary-blue);
+    background-image: url('./thumbnails/doodle_cricket_final.png');
+}
+
+.ghost-bg {
+    background-color: var(--primary-red);
+    background-image: url('./thumbnails/doodle_ghost_thumbnail.svg');
+}
+
+.hurdles-bg {
+    background-color: var(--primary-green);
+    background-image: url('./thumbnails/hurdles.png');
+}
+
+.emergent-bg {
+    background-color: var(--primary-yellow);
+    background-image: url('./thumbnails/doodle_art_thumbnail.svg');
+}
 
 .card-content {
     padding: 1.5rem;
@@ -131,13 +146,25 @@ footer {
 
 /* Animations */
 @keyframes drop {
-    from { transform: translateY(-30px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+    from {
+        transform: translateY(-30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 @keyframes fade {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .animate-drop {
@@ -151,6 +178,11 @@ footer {
 
 /* Responsive */
 @media (max-width: 768px) {
-    h1 { font-size: 2.5rem; }
-    .gallery { grid-template-columns: 1fr; }
+    h1 {
+        font-size: 2.5rem;
+    }
+
+    .gallery {
+        grid-template-columns: 1fr;
+    }
 }
