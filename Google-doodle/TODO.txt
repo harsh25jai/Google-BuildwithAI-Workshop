@@ -105,3 +105,5 @@ Output:
 - Swipe detection logic for hard turns
 - Billboard UI implementation
 - Integration into game loop
+
+9. I want to add thumnail images for, add some dummy images and create folder will replace those dummy images with actual later
